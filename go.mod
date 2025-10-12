@@ -11,7 +11,7 @@ require (
 )
 
 require (
-	github.com/ShopOnGO/product-proto v0.0.0-20250428123543-e3249a1d6640 // indirect
+	github.com/ShopOnGO/product-proto v0.0.0-20251012215143-42bf66ae80b3 // indirect
 	github.com/bytedance/sonic v1.13.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect

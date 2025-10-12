@@ -6,6 +6,8 @@ services:
     command: ./wait-for-db.sh ./recommendation_service "migrate"
     environment:
       - DSN=${DSN}
+      - PRODUCT_SERVICE_HOST=product_container
+      - PRODUCT_SERVICE_PORT=50053
       # - POSTGRES_HOST=go_shop_postgres
       # - POSTGRES_USER=${POSTGRES_USER}
       # - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
