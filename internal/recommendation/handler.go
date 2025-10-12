@@ -15,7 +15,7 @@ func NewRecommendationHandler(router *gin.Engine, svc *RecommendationService) *R
 
 	recGroup := router.Group("/recommendation-service/recommendations")
 	{
-		recGroup.POST("", handler.getRecommendations) // POST /recommendations-service/recommendations
+		recGroup.POST("", handler.getRecommendations)
 	}
 
 	return handler

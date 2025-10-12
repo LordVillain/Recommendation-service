@@ -8,14 +8,13 @@ import (
 )
 
 func main() {
-	r := gin.Default()
+	router := gin.Default()
 	fmt.Println("Starting recommendation service...")
 
-	mlURL := "http://localhost:8000" // Python ML сервис
+	mlURL := "http://recommender-service:5000" // Python ML сервис
     
 	recSvc := recommendation.NewRecommendationService(mlURL)
-	recommendation.NewRecommendationHandler(r, recSvc)
+	recommendation.NewRecommendationHandler(router, recSvc)
 
-	r.Run(":8086")
-
+	router.Run(":8086")
 }
