@@ -6,7 +6,7 @@ type RecommendationRequest struct {
 }
 
 type RecommenderResponse struct {
-	ProductIDs []uint64 `json:"product_ids"`
+	ProductIDs []uint `json:"product_ids"`
 }
 
 type RecommendationResponse struct {

@@ -47,28 +47,46 @@ func InitGRPCClients() *GRPCClients {
 func (s *RecommendationService) GetRecommendations(req RecommendationRequest) (*RecommendationResponse, error) {
 	ctx := context.Background()
 
+	logger.Infof("Requesting products for user: %d", req.UserID)
 	resp, err := http.Get(fmt.Sprintf("%s/api/predict/%d/", s.mlServiceURL, req.UserID))
 	if err != nil {
 		return nil, fmt.Errorf("ML service unavailable: %v", err)
 	}
 	defer resp.Body.Close()
 
-	var recs RecommenderResponse
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("ML service returned status %d", resp.StatusCode)
+	}
 
+	var recs RecommenderResponse
 	if err := json.NewDecoder(resp.Body).Decode(&recs); err != nil {
 		return nil, fmt.Errorf("failed to decode ML response list of products: %v", err)
 	}
 
+	productIDsUint64 := make([]uint64, len(recs.ProductIDs))
+	for i, id := range recs.ProductIDs {
+		if id <= 0 {
+			continue
+		}
+		productIDsUint64[i] = uint64(id)
+	}
+
+	logger.Infof("Product IDs: %v", productIDsUint64)
+
 	// grpcResp, err := s.Clients.ProductClient.GetProductsByIDs(ctx, &pb.GetProductsByIDsRequest{
 	// 	ProductIds: recs.ProductIDs,
 	// })
+
+	// добавить проверку что такие id продуктов есть
+
 	grpcResp, err := s.Clients.ProductClient.GetProductsByIDs(ctx, &pb.GetProductsByIDsRequest{
-    	ProductIds: []uint64{3, 4, 5},
+    	ProductIds: productIDsUint64,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("error fetching products: %v", err)
 	}
-	fmt.Println(grpcResp.Products)
+
+	logger.Info(grpcResp.Products)
 
 	localProducts := make([]Product, len(grpcResp.Products))
 	for i, p := range grpcResp.Products {
