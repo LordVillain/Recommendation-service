@@ -44,11 +44,11 @@ func InitGRPCClients() *GRPCClients {
 	}
 }
 
-func (s *RecommendationService) GetRecommendations(req RecommendationRequest) (*RecommendationResponse, error) {
+func (s *RecommendationService) GetRecommendations(userID uint) (*RecommendationResponse, error) {
 	ctx := context.Background()
 
-	logger.Infof("Requesting products for user: %d", req.UserID)
-	resp, err := http.Get(fmt.Sprintf("%s/api/predict/%d/", s.mlServiceURL, req.UserID))
+	logger.Infof("Requesting products for user: %d", userID)
+	resp, err := http.Get(fmt.Sprintf("%s/api/predict/%d/", s.mlServiceURL, userID))
 	if err != nil {
 		return nil, fmt.Errorf("ML service unavailable: %v", err)
 	}
@@ -107,7 +107,7 @@ func (s *RecommendationService) GetRecommendations(req RecommendationRequest) (*
 	}
 
 	return &RecommendationResponse{
-		UserID:   req.UserID,
+		UserID:   uint(userID),
 		Products: localProducts,
 	}, nil
 }

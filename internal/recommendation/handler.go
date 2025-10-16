@@ -3,6 +3,7 @@ package recommendation
 import (
 	"net/http"
 
+	"github.com/LordVillain/Recommendation-service/pkg/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,13 +32,19 @@ func NewRecommendationHandler(router *gin.Engine, svc *RecommendationService) *R
 // @Failure 500 {object} gin.H "Ошибка сервиса"
 // @Router /recommendations-service/recommendations [post]
 func (h *RecommendationHandler) getRecommendations(c *gin.Context) {
-	var req RecommendationRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректные данные"})
+	userIDVal, exists := c.Get(string(middleware.ContextUserIDKey))
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found"})
 		return
 	}
 
-	recs, err := h.recommendationSvc.GetRecommendations(req)
+	userID, ok := userIDVal.(uint) // или uint64, string — смотрите вашу реализацию
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID type"})
+		return
+	}
+
+	recs, err := h.recommendationSvc.GetRecommendations(userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
